@@ -6,6 +6,9 @@ import {
   StatusBar,
   StyleSheet,
   View,
+  Button,
+  Text,
+  TextInput
 } from 'react-native';
 
 import MainTabNavigator from './MainTabNavigator';
@@ -14,10 +17,29 @@ class SignInScreen extends React.Component {
   static navigationOptions = {
     title: 'Please sign in',
   };
+  constructor(props){
+    super(props)
+    this.state={
+      username: "",
+      password: ""
+    }
+  }
 
   render() {
     return (
       <View style={styles.container}>
+        <Text>Username:</Text>
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({username: text})}
+          value={this.state.username}
+        />
+        <Text>Password:</Text>
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({password: text})}
+          value={this.state.password} secureTextEntry={true}
+        />
         <Button title="Sign in!" onPress={this._signInAsync} />
       </View>
     );
@@ -55,7 +77,14 @@ class AuthLoadingScreen extends React.Component {
   }
 }
 const AuthStack = createStackNavigator({ SignIn: SignInScreen });
-const AppStack = createStackNavigator({ Main: MainTabNavigator });
+
+const AppStack = createStackNavigator({
+  main: MainTabNavigator
+}, {
+  initialRouteName: 'main',
+  header: null,
+  headerMode: 'none'
+});
 
 export default createAppContainer(createSwitchNavigator(
   {
@@ -67,3 +96,10 @@ export default createAppContainer(createSwitchNavigator(
     initialRouteName: 'AuthLoading',
   }
 ));
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+  },
+})

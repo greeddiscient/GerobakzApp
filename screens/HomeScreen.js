@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment'
 import {
   Image,
   Platform,
@@ -10,19 +11,22 @@ import {
   Alert,
   Button,
   View,
+  AsyncStorage,
 } from 'react-native';
-import { WebBrowser } from 'expo';
+import { WebBrowser, Constants, Location, Permissions  } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
+    title:'Welcome to the app',
     header: null,
   };
   constructor(props){
     super(props)
     this.state={
       quantity: 1,
+      location: null
     }
   }
   onIncreaseItem(type){
@@ -42,7 +46,23 @@ export default class HomeScreen extends React.Component {
       })
     }
   }
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage: 'Permission to access location was denied',
+      });
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    console.log(location)
+    this.setState({ location });
+  };
   saveOrder(){
+    console.log(moment().format('MMMM Do YYYY, h:mm:ss a'))
+    this._getLocationAsync()
+    
+    
     Alert.alert(
       'Yakin',
       'Anda yakin mau masukkan \n Nasi Goreng '+this.state.quantity,
@@ -52,7 +72,12 @@ export default class HomeScreen extends React.Component {
       ],
       {cancelable:false}
     )
+    
   }
+  _signOutAsync = async () => {
+    await AsyncStorage.clear();
+    this.props.navigation.navigate('Auth');
+  };
   render() {
     return (
       <View style={styles.container}>
@@ -66,47 +91,10 @@ export default class HomeScreen extends React.Component {
             <TouchableHighlight onPress={this.onDecreaseItem.bind(this,"nasgor")}>
               <Text>-</Text>
             </TouchableHighlight>
-            <Button onPress={this.saveOrder.bind(this)} title="Save"/>
+            <Button onPress={this.saveOrder.bind(this)} title="Masukkan Order"/>
+            <Button title="Logout" onPress={this._signOutAsync} />
           </View>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
-
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>Get started by opening</Text>
-
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
-
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
-        </View>
+          </ScrollView>
       </View>
     );
   }

@@ -38,7 +38,7 @@ export default class HomeScreen extends React.Component {
   onDecreaseItem(type){
     quantity=this.state.quantity
     if (quantity===1){
-      
+
     }
     else{
       this.setState({
@@ -46,6 +46,7 @@ export default class HomeScreen extends React.Component {
       })
     }
   }
+
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
@@ -58,11 +59,10 @@ export default class HomeScreen extends React.Component {
     console.log(location)
     this.setState({ location });
   };
+
   saveOrder(){
     console.log(moment().format('MMMM Do YYYY, h:mm:ss a'))
     this._getLocationAsync()
-    
-    
     Alert.alert(
       'Yakin',
       'Anda yakin mau masukkan \n Nasi Goreng '+this.state.quantity,
@@ -72,25 +72,33 @@ export default class HomeScreen extends React.Component {
       ],
       {cancelable:false}
     )
-    
   }
+
   _signOutAsync = async () => {
     await AsyncStorage.clear();
     this.props.navigation.navigate('Auth');
-  };
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <View style= {styles.welcomeContainer}>
-            <Text>Nasi Goreng</Text>
-            <TouchableHighlight onPress={this.onIncreaseItem.bind(this,"nasgor")}>
-              <Text>+</Text>
-            </TouchableHighlight>
-            <Text>{this.state.quantity}</Text>
-            <TouchableHighlight onPress={this.onDecreaseItem.bind(this,"nasgor")}>
-              <Text>-</Text>
-            </TouchableHighlight>
+            <View style={styles.addItemContainer}>
+              <View style={styles.foodItemContainer}>
+                <Text style={styles.getStartedText}>Nasi Goreng</Text>
+              </View>
+              <View style={styles.incrementContainer}>
+                <TouchableHighlight onPress={this.onIncreaseItem.bind(this,"nasgor")}>
+                  <Text style={styles.incrementDecrementText}>+</Text>
+                </TouchableHighlight>
+                <Text style={styles.quantityText}>{this.state.quantity}</Text>
+                <TouchableHighlight onPress={this.onDecreaseItem.bind(this,"nasgor")}>
+                  <Text style={styles.incrementDecrementText}>-</Text>
+                </TouchableHighlight>
+              </View>
+
+            </View>
             <Button onPress={this.saveOrder.bind(this)} title="Masukkan Order"/>
             <Button title="Logout" onPress={this._signOutAsync} />
           </View>
@@ -153,6 +161,39 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
   },
+  foodItemContainer:{
+    backgroundColor:'#e0115f',
+    paddingTop:10,
+    paddingBottom:10,
+    paddingLeft:20,
+    paddingRight:20,
+    borderRadius:10,
+  },
+  addItemContainer:{
+    flex: 1,
+    flexDirection: 'row',
+    alignItems:'center',
+    justifyContent:'center',
+    marginLeft: 10
+  },
+  incrementContainer:{
+    flex: 2,
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'center',
+    marginLeft: 20
+  },
+  incrementDecrementText:{
+    fontSize: 60,
+    color: '#000',
+    marginLeft:15,
+
+  },
+  quantityText:{
+    fontSize: 48,
+    color: '#000',
+    marginLeft: 15,
+  },
   welcomeImage: {
     width: 100,
     height: 80,
@@ -176,11 +217,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
+    fontSize: 32,
+    color: '#fff',
     textAlign: 'center',
   },
+
   tabBarInfoContainer: {
     position: 'absolute',
     bottom: 0,

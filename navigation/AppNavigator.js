@@ -8,8 +8,10 @@ import {
   View,
   Button,
   Text,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
+import axios from 'axios';
 
 import MainTabNavigator from './MainTabNavigator';
 
@@ -21,7 +23,8 @@ class SignInScreen extends React.Component {
     super(props)
     this.state={
       username: "",
-      password: ""
+      password: "",
+      loggingin: false,
     }
   }
 
@@ -40,15 +43,47 @@ class SignInScreen extends React.Component {
           onChangeText={(text) => this.setState({password: text})}
           value={this.state.password} secureTextEntry={true}
         />
-        <Button title="Sign in!" onPress={this._signInAsync} />
+        {this.state.loggingin ? <ActivityIndicator /> : <Button title="Sign in!" onPress={this._signInAsync} />}
       </View>
     );
   }
 
-  _signInAsync = async () => {
-    await AsyncStorage.setItem('userToken', 'abc');
-    this.props.navigation.navigate('App');
+  _signInAsync = () => {
+    this.setState({
+      loggingin: true
+    })
+    that=this
+    axios.post('http://gerobakz-api.herokuapp.com/api/login', {
+      username: this.state.username,
+      password: this.state.password
+    })
+    .then(function (response) {
+      if(response.data.hasOwnProperty('failed')){
+        Alert.alert(
+          'Login Gagal',
+          'Mohon cek kembali username dan password anda',
+          [
+            {text: 'OK', onPress: () => console.log('Cancel Pressed')},
+          ],
+          {cancelable:false}
+        )
+        that.setState({
+          loggingin: false
+        })
+      }
+      else{
+        that.saveToken()
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
   };
+
+  async saveToken(){
+    await AsyncStorage.setItem('userToken', this.state.username);
+    this.props.navigation.navigate('App');
+  }
 }
 
 class AuthLoadingScreen extends React.Component {

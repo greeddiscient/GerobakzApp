@@ -14,6 +14,7 @@ import {
   AsyncStorage,
 } from 'react-native';
 import { WebBrowser, Constants, Location, Permissions  } from 'expo';
+import axios from 'axios'
 
 import { MonoText } from '../components/StyledText';
 
@@ -26,8 +27,17 @@ export default class HomeScreen extends React.Component {
     super(props)
     this.state={
       quantity: 1,
-      location: null
+      location: null,
+      user: ''
     }
+  }
+  async componentDidMount(){
+    user = await AsyncStorage.getItem('userToken')
+    console.log(user)
+    this.setState({
+      user: user
+    })
+
   }
   onIncreaseItem(type){
     quantity=this.state.quantity
@@ -60,18 +70,49 @@ export default class HomeScreen extends React.Component {
     this.setState({ location });
   };
 
-  saveOrder(){
+  saveOrderAlert(){
     console.log(moment().format('MMMM Do YYYY, h:mm:ss a'))
     this._getLocationAsync()
     Alert.alert(
       'Yakin',
       'Anda yakin mau masukkan \n Nasi Goreng '+this.state.quantity,
       [
-        {text: 'Masukkan Order', onPress: () => console.log('Ask me later pressed')},
+        {text: 'Masukkan Order', onPress: () => this.saveOrder()},
         {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
       ],
       {cancelable:false}
     )
+  }
+  saveOrder(){
+    that=this
+    axios.post('http://gerobakz-api.herokuapp.com/api/new_order', {
+      user: this.state.user,
+      order: [
+        {
+          item: "nasi goreng",
+          quantity: this.state.quantity
+        }
+      ],
+      location: this.state.location.coords,
+      time: moment().format('MMMM Do YYYY, h:mm:ss a')
+      }
+    )
+    .then(function (response) {
+        Alert.alert(
+          'Sukses',
+          'Silahkan ambil pembayaran',
+          [
+            {text: 'OK', onPress: () => console.log('OK Pressed')},
+          ],
+          {cancelable:false}
+        )
+        that.setState({
+          quantity: 1
+        })
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
   }
 
   _signOutAsync = async () => {
@@ -99,7 +140,7 @@ export default class HomeScreen extends React.Component {
               </View>
 
             </View>
-            <Button onPress={this.saveOrder.bind(this)} title="Masukkan Order"/>
+            <Button onPress={this.saveOrderAlert.bind(this)} title="Masukkan Order"/>
             <Button title="Logout" onPress={this._signOutAsync} />
           </View>
           </ScrollView>

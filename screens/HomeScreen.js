@@ -12,6 +12,7 @@ import {
   Button,
   View,
   AsyncStorage,
+  ActivityIndicator
 } from 'react-native';
 import { WebBrowser, Constants, Location, Permissions  } from 'expo';
 import axios from 'axios'
@@ -26,9 +27,13 @@ export default class HomeScreen extends React.Component {
   constructor(props){
     super(props)
     this.state={
-      quantity: 1,
+      nasgorQuantity: 0,
+      airQuantity: 0,
+      airPrice: 0,
+      nasgorPrice: 0,
       location: null,
-      user: ''
+      user: '',
+      savingOrder: false
     }
   }
   async componentDidMount(){
@@ -40,21 +45,53 @@ export default class HomeScreen extends React.Component {
 
   }
   onIncreaseItem(type){
-    quantity=this.state.quantity
-    this.setState({
-      quantity: quantity+1
-    })
-  }
-  onDecreaseItem(type){
-    quantity=this.state.quantity
-    if (quantity===1){
-
-    }
-    else{
+    if (type === "air"){
+      quantity= this.state.airQuantity
+      price= this.state.airPrice
       this.setState({
-        quantity: quantity-1
+        airQuantity: quantity+1,
+        airPrice: price+3000
       })
     }
+    else if(type === "nasgor"){
+      quantity=this.state.nasgorQuantity
+      price=this.state.nasgorPrice
+      this.setState({
+        nasgorQuantity: quantity+1,
+        nasgorPrice: price+20000
+      })
+    }
+
+  }
+  onDecreaseItem(type){
+    if (type === "air"){
+      quantity= this.state.airQuantity
+      price= this.state.airPrice
+      that= this
+      if(quantity===0){
+
+      }
+      else{
+        this.setState({
+          airQuantity: quantity-1,
+          airPrice: price-3000
+        })
+      }
+    }
+    else if(type==="nasgor"){
+      quantity=this.state.nasgorQuantity
+      price=this.state.nasgorPrice
+      if (quantity===0){
+
+      }
+      else{
+        this.setState({
+          nasgorQuantity: quantity-1,
+          nasgorPrice: price-20000
+        })
+      }
+    }
+
   }
 
   _getLocationAsync = async () => {
@@ -75,7 +112,7 @@ export default class HomeScreen extends React.Component {
     this._getLocationAsync()
     Alert.alert(
       'Yakin',
-      'Anda yakin mau masukkan \n Nasi Goreng '+this.state.quantity,
+      'Anda yakin mau masukkan \n Nasi Goreng '+this.state.nasgorQuantity+' dengan harga Rp'+this.state.nasgorPrice +'\n Air Putih '+this.state.airQuantity+ ' dengan harga Rp'+this.state.airPrice,
       [
         {text: 'Masukkan Order', onPress: () => this.saveOrder()},
         {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
@@ -84,15 +121,23 @@ export default class HomeScreen extends React.Component {
     )
   }
   saveOrder(){
+    this.setState({
+      savingOrder: true
+    })
     that=this
     axios.post('http://gerobakz-api.herokuapp.com/api/new_order', {
       user: this.state.user,
       order: [
         {
           item: "nasi goreng",
-          quantity: this.state.quantity
+          quantity: this.state.nasgorQuantity
+        },
+        {
+          item: "air putih",
+          quantity: this.state.airQuantity
         }
       ],
+      totalPrice: this.state.nasgorPrice+this.state.airPrice,
       location: this.state.location.coords,
       time: moment().format('MMMM Do YYYY, h:mm:ss a')
       }
@@ -100,18 +145,25 @@ export default class HomeScreen extends React.Component {
     .then(function (response) {
         Alert.alert(
           'Sukses',
-          'Silahkan ambil pembayaran',
+          'Silahkan ambil pembayaran Rp'+(that.state.nasgorPrice+that.state.airPrice),
           [
             {text: 'OK', onPress: () => console.log('OK Pressed')},
           ],
           {cancelable:false}
         )
         that.setState({
-          quantity: 1
+          nasgorQuantity: 0,
+          nasgorPrice: 0,
+          airQuantity: 0,
+          airPrice: 0,
+          savingOrder: false
         })
     })
     .catch(function (error) {
       console.log(error);
+      that.setState({
+        savingOrder: false
+      })
     });
   }
 
@@ -125,22 +177,45 @@ export default class HomeScreen extends React.Component {
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <View style= {styles.welcomeContainer}>
+
             <View style={styles.addItemContainer}>
               <View style={styles.foodItemContainer}>
                 <Text style={styles.getStartedText}>Nasi Goreng</Text>
+                <Text style={styles.priceText}>Rp20,000</Text>
               </View>
               <View style={styles.incrementContainer}>
                 <TouchableHighlight onPress={this.onIncreaseItem.bind(this,"nasgor")}>
                   <Text style={styles.incrementDecrementText}>+</Text>
                 </TouchableHighlight>
-                <Text style={styles.quantityText}>{this.state.quantity}</Text>
+                <Text style={styles.quantityText}>{this.state.nasgorQuantity}</Text>
                 <TouchableHighlight onPress={this.onDecreaseItem.bind(this,"nasgor")}>
                   <Text style={styles.incrementDecrementText}>-</Text>
                 </TouchableHighlight>
               </View>
-
             </View>
-            <Button onPress={this.saveOrderAlert.bind(this)} title="Masukkan Order"/>
+
+            <View style={styles.addItemContainer}>
+              <View style={styles.foodItemContainer}>
+                <Text style={styles.getStartedText}>Air Putih</Text>
+                <Text style={styles.priceText}>Rp3,000</Text>
+              </View>
+              <View style={styles.incrementContainer}>
+                <TouchableHighlight onPress={this.onIncreaseItem.bind(this,"air")}>
+                  <Text style={styles.incrementDecrementText}>+</Text>
+                </TouchableHighlight>
+                <Text style={styles.quantityText}>{this.state.airQuantity}</Text>
+                <TouchableHighlight onPress={this.onDecreaseItem.bind(this,"air")}>
+                  <Text style={styles.incrementDecrementText}>-</Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+
+            <View>
+              <View style ={styles.foodItemContainer}>
+                <Text style={styles.getStartedText}>Harga Total: Rp {(this.state.nasgorPrice+this.state.airPrice).toLocaleString()}</Text>
+              </View>
+            </View>
+            {this.state.savingOrder ? <ActivityIndicator/> : <Button onPress={this.saveOrderAlert.bind(this)} title="Masukkan Order"/>}
             <Button title="Logout" onPress={this._signOutAsync} />
           </View>
           </ScrollView>
@@ -215,7 +290,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'center',
-    marginLeft: 10
+    marginLeft: 10,
+    marginBottom: 10
   },
   incrementContainer:{
     flex: 2,
@@ -259,6 +335,11 @@ const styles = StyleSheet.create({
   },
   getStartedText: {
     fontSize: 32,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  priceText: {
+    fontSize: 16,
     color: '#fff',
     textAlign: 'center',
   },

@@ -198,9 +198,10 @@ export default class HomeScreen extends React.Component {
                 <Text style={styles.getStartedText}>Harga Total: Rp {(this.state.nasgorPrice+this.state.airPrice).toLocaleString()}</Text>
               </View>
             </View>
-            {this.state.savingOrder ? <ActivityIndicator/> : <Button onPress={this.saveOrderAlert.bind(this)} title="Masukkan Order"/>}
-            <Button title="Logout" onPress={this._signOutAsync} />
+            {this.state.savingOrder ? <ActivityIndicator/> : <Button style={styles.button} onPress={this.saveOrderAlert.bind(this)} title="Masukkan Order"/>}
+            
           </View>
+          <Button style={styles.button} title="Logout" onPress={this._signOutAsync} />
           </ScrollView>
       </View>
     );
@@ -245,6 +246,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  button: {
+    marginBottom: 50,
+  },
   developmentModeText: {
     marginBottom: 20,
     color: 'rgba(0,0,0,0.4)',
@@ -267,13 +271,14 @@ const styles = StyleSheet.create({
     paddingLeft:20,
     paddingRight:20,
     borderRadius:10,
+    marginBottom:10,
   },
   addItemContainer:{
     flex: 1,
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'center',
-    marginLeft: 10,
+    marginLeft: 5,
     marginBottom: 10
   },
   incrementContainer:{
@@ -281,12 +286,12 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'center',
     justifyContent:'center',
-    marginLeft: 20
+    marginLeft: 0
   },
   incrementDecrementText:{
     fontSize: 60,
     color: '#000',
-    marginLeft:15,
+    marginLeft:10,
 
   },
   quantityText:{

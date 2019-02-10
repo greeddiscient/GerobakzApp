@@ -58,7 +58,7 @@ export default class HomeScreen extends React.Component {
       price=this.state.nasgorPrice
       this.setState({
         nasgorQuantity: quantity+1,
-        nasgorPrice: price+20000
+        nasgorPrice: price+25000
       })
     }
 
@@ -87,7 +87,7 @@ export default class HomeScreen extends React.Component {
       else{
         this.setState({
           nasgorQuantity: quantity-1,
-          nasgorPrice: price-20000
+          nasgorPrice: price-25000
         })
       }
     }
@@ -112,7 +112,7 @@ export default class HomeScreen extends React.Component {
     this._getLocationAsync()
     Alert.alert(
       'Yakin',
-      'Anda yakin mau masukkan \n Nasi Goreng '+this.state.nasgorQuantity+' dengan harga Rp'+this.state.nasgorPrice +'\n Air Putih '+this.state.airQuantity+ ' dengan harga Rp'+this.state.airPrice,
+      'Anda yakin mau masukkan \n Nasi Goreng '+this.state.nasgorQuantity+' dengan harga Rp'+this.state.nasgorPrice,
       [
         {text: 'Masukkan Order', onPress: () => this.saveOrder()},
         {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
@@ -130,16 +130,13 @@ export default class HomeScreen extends React.Component {
       order: [
         {
           item: "nasi goreng",
-          quantity: this.state.nasgorQuantity
-        },
-        {
-          item: "air putih",
-          quantity: this.state.airQuantity
+          quantity: this.state.nasgorQuantity,
+          price: this.state.nasgorPrice
         }
       ],
       totalPrice: this.state.nasgorPrice+this.state.airPrice,
       location: this.state.location.coords,
-      time: moment().format('MMMM Do YYYY, h:mm:ss a')
+      time: moment().format('YYYY-MM-DD HH:mm:ss')
       }
     )
     .then(function (response) {
@@ -181,7 +178,7 @@ export default class HomeScreen extends React.Component {
             <View style={styles.addItemContainer}>
               <View style={styles.foodItemContainer}>
                 <Text style={styles.getStartedText}>Nasi Goreng</Text>
-                <Text style={styles.priceText}>Rp20,000</Text>
+                <Text style={styles.priceText}>Rp25,000</Text>
               </View>
               <View style={styles.incrementContainer}>
                 <TouchableHighlight onPress={this.onIncreaseItem.bind(this,"nasgor")}>
@@ -194,21 +191,7 @@ export default class HomeScreen extends React.Component {
               </View>
             </View>
 
-            <View style={styles.addItemContainer}>
-              <View style={styles.foodItemContainer}>
-                <Text style={styles.getStartedText}>Air Putih</Text>
-                <Text style={styles.priceText}>Rp3,000</Text>
-              </View>
-              <View style={styles.incrementContainer}>
-                <TouchableHighlight onPress={this.onIncreaseItem.bind(this,"air")}>
-                  <Text style={styles.incrementDecrementText}>+</Text>
-                </TouchableHighlight>
-                <Text style={styles.quantityText}>{this.state.airQuantity}</Text>
-                <TouchableHighlight onPress={this.onDecreaseItem.bind(this,"air")}>
-                  <Text style={styles.incrementDecrementText}>-</Text>
-                </TouchableHighlight>
-              </View>
-            </View>
+            
 
             <View>
               <View style ={styles.foodItemContainer}>

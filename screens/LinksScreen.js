@@ -21,6 +21,7 @@ export default class LinksScreen extends React.Component {
       setoran:0,
       jualLagi:0,
       nextKomisiPersen:0,
+      simulasiKejual:0
     }
   }
   componentDidMount(){
@@ -134,7 +135,7 @@ export default class LinksScreen extends React.Component {
         <NavigationEvents
           onWillFocus={payload=>this.componentDidMount()}
         />
-        <Text>Hari ini: {moment().format("MMM DD YY")}</Text>
+        <Text>Hari ini: {moment().format("MMM DD YYYY")}</Text>
         <Text>Kejual: {this.state.kejual}</Text>
         <Text>Omset: Rp{(this.state.omset).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
         <Text>% Komisi: {this.state.komisiPersen}%</Text>

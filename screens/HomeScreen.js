@@ -112,7 +112,7 @@ export default class HomeScreen extends React.Component {
     this._getLocationAsync()
     Alert.alert(
       'Yakin',
-      'Anda yakin mau masukkan \n Nasi Goreng '+this.state.nasgorQuantity+' dengan harga Rp'+this.state.nasgorPrice,
+      'Anda yakin mau masukkan \n Nasi Goreng '+this.state.nasgorQuantity+' dengan harga Rp'+this.state.nasgorPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       [
         {text: 'Masukkan Order', onPress: () => this.saveOrder()},
         {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
@@ -134,7 +134,7 @@ export default class HomeScreen extends React.Component {
           price: this.state.nasgorPrice
         }
       ],
-      totalPrice: this.state.nasgorPrice+this.state.airPrice,
+      totalPrice: this.state.nasgorPrice,
       location: this.state.location.coords,
       time: moment().format('YYYY-MM-DD HH:mm:ss')
       }
@@ -142,7 +142,7 @@ export default class HomeScreen extends React.Component {
     .then(function (response) {
         Alert.alert(
           'Sukses',
-          'Silahkan ambil pembayaran Rp'+(that.state.nasgorPrice+that.state.airPrice),
+          'Silahkan ambil pembayaran Rp'+(that.state.nasgorPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")),
           [
             {text: 'OK', onPress: () => console.log('OK Pressed')},
           ],
@@ -195,50 +195,18 @@ export default class HomeScreen extends React.Component {
 
             <View>
               <View style ={styles.foodItemContainer}>
-                <Text style={styles.getStartedText}>Harga Total: Rp {(this.state.nasgorPrice+this.state.airPrice).toLocaleString()}</Text>
+                <Text style={styles.getStartedText}>Harga Total: Rp {(this.state.nasgorPrice+this.state.airPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
               </View>
             </View>
-            {this.state.savingOrder ? <ActivityIndicator/> : <Button style={styles.button} onPress={this.saveOrderAlert.bind(this)} title="Masukkan Order"/>}
+            {this.state.savingOrder ? <ActivityIndicator/> : <Button  onPress={this.saveOrderAlert.bind(this)} title="Masukkan Order"/>}
             
           </View>
-          <Button style={styles.button} title="Logout" onPress={this._signOutAsync} />
+          <Button  title="Logout" onPress={this._signOutAsync} />
           </ScrollView>
       </View>
     );
   }
 
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
-  }
-
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 
 const styles = StyleSheet.create({
@@ -246,9 +214,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  button: {
-    marginBottom: 50,
-  },
+
   developmentModeText: {
     marginBottom: 20,
     color: 'rgba(0,0,0,0.4)',
@@ -262,7 +228,7 @@ const styles = StyleSheet.create({
   welcomeContainer: {
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 200,
   },
   foodItemContainer:{
     backgroundColor:'#e0115f',
@@ -278,7 +244,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'center',
-    marginLeft: 5,
+    marginLeft: 0,
     marginBottom: 10
   },
   incrementContainer:{

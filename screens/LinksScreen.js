@@ -141,7 +141,7 @@ export default class LinksScreen extends React.Component {
         <Text>% Komisi: {this.state.komisiPersen}%</Text>
         <Text>Komisi: Rp{(this.state.komisi).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
         <Text>Jual [{this.state.jualLagi}] lagi untuk dapat [{this.state.nextKomisiPersen}%] komisi</Text>
-        <Text>Simulasi komisi tingkat berikut: [{this.state.simulasiKejual}] kejual dapat [Rp{(this.state.simulasiKejual*25000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}]</Text>
+        <Text>Simulasi komisi tingkat berikut: [{this.state.simulasiKejual}] kejual dapat [Rp{(this.state.simulasiKejual*25000*this.state.nextKomisiPersen/100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}]</Text>
         <Text>Setoran: Rp{(this.state.omset-this.state.komisi).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
       
       </ScrollView>
